@@ -1,4 +1,5 @@
 import re
+import uuid
 
 from cassandra.cqlengine import columns
 from cassandra.cqlengine.models import Model
@@ -8,19 +9,19 @@ from .types import HardwareType
 # Define Testing model class
 class Hardware(Model):
     __table_name__ = 'hardware'
-    hardware_id = columns.UUID(primary_key=True)
-    serial_number = columns.Text(primary_key=True)
-    order_number = columns.Integer(primary_key=True)
-    name = columns.Text()
-    hardware_type = columns.Text(discriminator_column=True)
-    mirror = columns.Text()
+    hardware_id = columns.UUID(primary_key=True, default=uuid.uuid1())
+    serial_number = columns.Text(primary_key=True, required=True)
+    order_number = columns.Integer(primary_key=True, required=True)
+    name = columns.Text(required=True)
+    hardware_type = columns.Text(discriminator_column=True, required=True)
+    mirror = columns.Text(required=True)
 
 
 class AU(Hardware):
     __discriminator_value__ = HardwareType.AU.value
-    variant = columns.Text()
-    static_test_id = columns.UUID()
-    dynamic_test_id = columns.UUID()
+    variant = columns.Text(required=True)
+    static_test_id = columns.UUID(default=uuid.uuid1())
+    dynamic_test_id = columns.UUID(default=uuid.uuid1())
 
     def variant_number(self) -> int:
         '''
@@ -34,10 +35,10 @@ class AU(Hardware):
 
 class MGC(Hardware):
     __discriminator_value__ = HardwareType.MGC.value
-    variant = columns.Text()
-    static_test = columns.UUID()
-    dynamic_test_id = columns.UUID()
-    size = columns.Text()
+    variant = columns.Text(required=True)
+    static_test = columns.UUID(default=uuid.uuid1())
+    dynamic_test_id = columns.UUID(default=uuid.uuid1())
+    size = columns.Text(required=True)
 
     def variant_number(self) -> int:
         '''
@@ -52,4 +53,4 @@ class MGC(Hardware):
 class VCM(Hardware):
     __discriminator_value__ = HardwareType.VCM.value
     dynamic_test_id = columns.UUID()
-    size = columns.Text()
+    size = columns.Text(required=True)

@@ -1,10 +1,12 @@
+import uuid
+
 from cassandra.cqlengine import columns
 from cassandra.cqlengine.models import Model
 
 # Define Testing model class
 class Test(Model):
     __table_name__ = 'testing'
-    test_id = columns.UUID(primary_key=True)
+    test_id = columns.UUID(primary_key=True, default=uuid.uuid1())
     test_type = columns.Text(discriminator_column=True)
     test_success = columns.Boolean()
     test_pass = columns.Boolean()
