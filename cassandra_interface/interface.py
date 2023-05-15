@@ -16,17 +16,14 @@ class CassandraInterface:
                  connect_immediately: bool = True) -> None:
         # Create cluster
         if isinstance(host, str):
-            self.cluster = Cluster(
-                [host],
-                port=port,
-                load_balancing_policy=RoundRobinPolicy()
-            )
-        elif isinstance(host, list):
-            self.cluster = Cluster(
-                host,
-                port=port,
-                load_balancing_policy=RoundRobinPolicy()
-            )
+            host = [host]
+
+        self.cluster = Cluster(
+            host,
+            port=port,
+            protocol_version=5,
+            load_balancing_policy=RoundRobinPolicy()
+        )
 
         # Connect (if required)
         self.session = None
