@@ -9,6 +9,7 @@ from cassandra.cqlengine import connection
 from cassandra.policies import RoundRobinPolicy
 
 os.environ['CQLENG_ALLOW_SCHEMA_MANAGEMENT'] = '1'
+logging.getLogger('cassandra').setLevel(logging.WARNING)
 
 class CassandraInterface:
     def __init__(self, host: Union[str, List[str]], port: int, keyspace: str = None,
