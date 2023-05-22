@@ -15,6 +15,7 @@ class Hardware(Model):
     name = columns.Text(required=True)
     hardware_type = columns.Text(discriminator_column=True, required=True)
     mirror = columns.Text(required=True)
+    created_on = columns.DateTime(required=True)
 
 
 class AU(Hardware):
