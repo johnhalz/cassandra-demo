@@ -1,6 +1,8 @@
 import os
 import logging
-from typing import Union, List
+from typing import Union, List, Dict
+
+import pandas as pd
 
 from cassandra.cluster import Cluster
 from cassandra.cqlengine.models import Model
@@ -125,3 +127,54 @@ class CassandraInterface:
 
         sync_table(table_model)
         logging.info(f'Created table {table_model.__table_name__} in keyspace {keyspace}.')
+
+    def delete_row(self, keyspace_name: str, table_name: str,
+                   primary_key_values: Union[str, Dict[str, str]]) -> None:
+        '''
+        Delete row from a table based on the primary key(s).
+
+        The primary key values can be either a string (if the table has a single primary key
+        column), or a dictionary of column names (as keys) and column values (as values) in
+        the dictionary.
+
+        Parameters
+        ----------
+        - `keyspace_name` (`str`): Name of keyspace
+        - `table_name` (`str`): Name of table
+        - `primary_key_values` (`Union[str, Dict[str, str]]`): Primary key value(s)
+        '''
+        if isinstance(primary_key_values, str):
+            delete_query = f"DELETE FROM {keyspace_name}.{table_name} WHERE primary_key_column = %s"
+            self.session.execute(delete_query, [primary_key_values])
+
+        elif isinstance(primary_key_values, dict):
+            # Create delete query from dictionary values
+            delete_query = f'DELETE FROM {keyspace_name}.{table_name} WHERE '
+            for primary_column in primary_key_values.keys():
+                delete_query += f'{primary_column} = %s AND '
+
+            # Remove the trailing 'AND' and add a semicolon at end of query
+            delete_query = delete_query[:-5] + ';'
+
+            # Execute query
+            self.session.execute(delete_query, list(primary_key_values.values()))
+
+    def table_to_df(self, keyspace_name: str, table_name: str) -> pd.DataFrame:
+        '''
+        Return a cassandra table to a pandas dataframe
+
+        Parameters
+        ----------
+        - `keyspace_name` (`str`): Name of keyspace
+        - `table_name` (`str`): Name of table
+
+        Returns
+        -------
+        - `pd.DataFrame`: Pandas dataframe
+        '''
+        query = f'SELECT * FROM {keyspace_name}.{table_name}'
+        result_set = self.session.execute(query)
+
+        # Convert the query result to a pandas DataFrame
+        data = list(result_set)
+        return pd.DataFrame(data)
