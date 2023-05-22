@@ -16,4 +16,4 @@ Run the command to start a container (named `cassandra_test`) running on port 90
 docker run -d --name cassandra_test -p 9042:9042 cassandra
 ```
 
-Pytho library [documentation link](https://docs.datastax.com/en/developer/python-driver/3.27/)
+Python library: [`cassandra-driver`](https://docs.datastax.com/en/developer/python-driver/3.27/)
