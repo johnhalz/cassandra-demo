@@ -7,8 +7,8 @@ from .types import (
     VCMPosition,
     MGCSize
 )
-from .testing import (
-    Test,
+from .production_step import (
+    ProductionStep,
     StaticLoad,
     Dynamic
 )
